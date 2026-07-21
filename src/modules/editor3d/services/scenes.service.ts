@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -56,7 +57,10 @@ export class ScenesService {
   }
 
   async create(data: Partial<Scene>): Promise<Scene> {
-    const scene = this.sceneRepository.create(data);
+    const scene = this.sceneRepository.create({
+      ...data,
+      id: data.id || randomUUID(),
+    });
     return this.sceneRepository.save(scene);
   }
 
