@@ -18,22 +18,44 @@ export class AssetsInfoService {
     order?: "desc" | "asc" | "DESC" | "ASC";
     query?: string;
     search?: string;
-    type?: string;
     category?: string;
   }): Promise<ListPageResult<AssetsInfo>> {
     let queryBuilder = this.assetsInfoRepository.createQueryBuilder("assets");
 
-    if (params.query || params.search) {
-      const keyword = params.query || params.search;
+    const keyword = params.search?.trim();
+
+    let typeFilter: string | undefined;
+
+    if (params.query) {
+      const filters = params.query
+        .split(/\s+/)
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .reduce<Record<string, string>>((acc, part) => {
+          const [field, ...rest] = part.split(":");
+          if (rest.length === 0) {
+            return acc;
+          }
+          const value = rest.join(":");
+          if (field === "type") {
+            acc[field] = value;
+          }
+          return acc;
+        }, {});
+
+      typeFilter = filters.type;
+    }
+
+    if (keyword) {
       queryBuilder = queryBuilder.where(
         "assets.name LIKE :keyword OR assets.tags LIKE :keyword",
         { keyword: `%${keyword}%` },
       );
     }
 
-    if (params.type) {
+    if (typeFilter) {
       queryBuilder = queryBuilder.andWhere("assets.type = :type", {
-        type: params.type,
+        type: typeFilter,
       });
     }
 

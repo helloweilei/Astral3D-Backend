@@ -1,39 +1,53 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from "typeorm";
 
-export type SupportType = 'Model' | 'Material' | 'Texture' | 'Billboard' | 'HDR';
+export type SupportType =
+  | "Model"
+  | "Material"
+  | "Texture"
+  | "Billboard"
+  | "HDR";
 
-@Entity('assets_info')
+@Entity("assets_info")
 export class AssetsInfo {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ type: "varchar", length: 255 })
   name: string;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: "varchar", length: 255 })
   type: SupportType;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: "varchar", length: 255 })
   category: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  categoryName: string;
-
-  @Column({ type: 'varchar', length: 500 })
+  @Column({ type: "varchar", length: 255 })
   thumbnail: string;
 
-  @Column({ type: 'bigint' })
+  @Column({ type: "bigint" })
   size: number;
 
-  @Column({ type: 'varchar', length: 500, nullable: true })
+  @Column({ type: "varchar", length: 255, nullable: true })
   tags: string;
 
-  @Column({ type: 'varchar', length: 500 })
+  @Column({ type: "varchar", length: 255, nullable: true })
   file: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
+  @CreateDateColumn({ type: "timestamp" })
   createTime: Date;
 
-  @UpdateDateColumn({ type: 'timestamp' })
+  @UpdateDateColumn({ type: "timestamp" })
   updateTime: Date;
+
+  @Column({ type: "tinyint", default: 0 })
+  delTag: number;
+
+  @Column({ type: "timestamp", nullable: true })
+  delTime: Date;
 }

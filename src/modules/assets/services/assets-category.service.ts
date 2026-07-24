@@ -1,9 +1,18 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { AssetsCategory } from "../entities/assets-category.entity";
+import {
+  AssetsCategory,
+  SupportType,
+} from "../entities/assets-category.entity";
 
-type AssetsCategoryNode = AssetsCategory & {
+export type AssetsCategoryNode = {
+  id: string;
+  key: string;
+  pkey?: string;
+  sortNum?: number;
+  label: string;
+  type?: SupportType;
   children?: AssetsCategoryNode[];
 };
 
@@ -14,7 +23,7 @@ export class AssetsCategoryService {
     private assetsCategoryRepository: Repository<AssetsCategory>,
   ) {}
 
-  async treeList(type?: string): Promise<AssetsCategory[]> {
+  async treeList(type?: string): Promise<AssetsCategoryNode[]> {
     let queryBuilder =
       this.assetsCategoryRepository.createQueryBuilder("category");
 
@@ -23,7 +32,7 @@ export class AssetsCategoryService {
     }
 
     const categories = await queryBuilder
-      .orderBy("category.sortNum", "ASC")
+      .orderBy("category.sort_num", "ASC")
       .getMany();
 
     return this.buildTree(categories);
@@ -34,13 +43,25 @@ export class AssetsCategoryService {
     const result: AssetsCategoryNode[] = [];
 
     categories.forEach((cat) => {
-      map.set(cat.id, { ...cat, children: [] });
+      const node: AssetsCategoryNode = {
+        id: String(cat.id),
+        key: cat.code,
+        pkey: cat.pcode,
+        sortNum: cat.sortNum,
+        label: cat.name,
+        type: cat.type as SupportType,
+        children: [],
+      };
+
+      map.set(cat.id, node);
     });
 
     categories.forEach((cat) => {
       const node = map.get(cat.id);
-      if (cat.pkey && node) {
-        const parent = Array.from(map.values()).find((p) => p.key === cat.pkey);
+      if (cat.pcode && node) {
+        const parent = Array.from(map.values()).find(
+          (p) => p.key === cat.pcode,
+        );
         if (parent) {
           parent.children?.push(node);
         } else {
