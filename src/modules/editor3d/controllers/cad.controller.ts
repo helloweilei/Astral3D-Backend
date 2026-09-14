@@ -10,7 +10,7 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
-import { CadService } from "../services/cad.service";
+import { CAD_STORAGE_PATH, CadService } from "../services/cad.service";
 import { Cad } from "../entities/cad.entity";
 import { ListPageResult } from "@/common/dto/page-result.dto";
 
@@ -41,7 +41,7 @@ export class CadController {
   @UseInterceptors(
     FileInterceptor("file", {
       storage: diskStorage({
-        destination: "./uploads/cad",
+        destination: CAD_STORAGE_PATH,
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + "-" + Math.round(Math.random() * 1e9);
